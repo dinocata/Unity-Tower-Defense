@@ -2,13 +2,12 @@
 using System.Collections;
 
 public class RTSCamera : MonoBehaviour {
-
     public LayerMask groundLayer;
 
     private const int LevelAreaX = 30;
     private const int LevelAreaY = 30;
 
-    private const int ScrollArea = 25;
+    private const int ScrollArea = 10;
     private const int ScrollSpeed = 30;
     private const int DragSpeed = 100;
 
@@ -19,6 +18,9 @@ public class RTSCamera : MonoBehaviour {
     private const int PanSpeed = 50;
     private const int PanAngleMin = 50;
     private const int PanAngleMax = 60;
+
+    private float mouseX;
+    private float mouseY;
 	
 	// Update is called once per frame
 	void Update () 
@@ -38,7 +40,7 @@ public class RTSCamera : MonoBehaviour {
         pan = Mathf.Clamp(pan, PanAngleMin, PanAngleMax);
         if (zoomDelta < 0 || transform.position.y <= ZoomMax)
         {
-            transform.eulerAngles = new Vector3(pan, 0, 0);
+           // transform.eulerAngles = new Vector3(pan, 0, 0);
         }
 
         // Move camera with arrow keys
@@ -64,7 +66,7 @@ public class RTSCamera : MonoBehaviour {
                 translation += Vector3.right * ScrollSpeed * Time.deltaTime;
             }
 
-            if (Input.mousePosition.y < ScrollArea + 50)
+            if (Input.mousePosition.y < ScrollArea)
             {
                 translation += Vector3.forward * -ScrollSpeed * Time.deltaTime;
             }
@@ -77,7 +79,7 @@ public class RTSCamera : MonoBehaviour {
 
         // Keep camera within level and zoom area
         var desiredPosition = transform.position + translation;
-        if (desiredPosition.x < -LevelAreaX|| LevelAreaX+5 < desiredPosition.x)
+        if (desiredPosition.x < -LevelAreaX+5 || LevelAreaX+5 < desiredPosition.x)
         {
             translation.x = 0;
         }

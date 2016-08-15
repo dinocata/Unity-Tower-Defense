@@ -7,7 +7,7 @@ public class ScoreManager : MonoBehaviour
 {
 
     public int lives = 20;
-    public int money = 100;
+    public float money = 100f;
 
     public Text moneyText;
     public Text livesText;

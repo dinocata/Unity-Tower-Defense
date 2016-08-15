@@ -3,29 +3,33 @@ using System.Collections;
 
 public class Enemy : MonoBehaviour
 {
+    private Transform targetPathNode;
+    private int pathNodeIndex = 0;
+    private bool dead = false;
 
-    GameObject pathGO;
-
-    Transform targetPathNode;
-    int pathNodeIndex = 0;
-
-    float speed = 5f;
-
+    public float speed = 5f;
     public float health = 10f;
-
     public int moneyValue = 1;
+
+    public MainPath mainPath;
+    public ScoreManager scoreManager;
+
+    public bool isDead()
+    {
+        return dead;
+    }
 
     // Use this for initialization
     void Start()
     {
-        pathGO = GameObject.Find("Path");
+
     }
 
     void GetNextPathNode()
     {
-        if (pathNodeIndex < pathGO.transform.childCount)
+        if (pathNodeIndex < mainPath.getNodeCount())
         {
-            targetPathNode = pathGO.transform.GetChild(pathNodeIndex);
+            targetPathNode = mainPath.getPathNode(pathNodeIndex);
             pathNodeIndex++;
         }
         else
@@ -44,12 +48,11 @@ public class Enemy : MonoBehaviour
             if (targetPathNode == null)
             {
                 // We've run out of path!
-                ReachedGoal();
                 return;
             }
         }
 
-        Vector3 dir = targetPathNode.position - this.transform.localPosition;
+        Vector3 dir = targetPathNode.position - transform.localPosition;
 
         float distThisFrame = speed * Time.deltaTime;
 
@@ -60,26 +63,23 @@ public class Enemy : MonoBehaviour
         }
         else
         {
-            // TODO: Consider ways to smooth this motion.
-
             // Move towards node
             transform.Translate(dir.normalized * distThisFrame, Space.World);
             Quaternion targetRotation = Quaternion.LookRotation(dir);
-            this.transform.rotation = Quaternion.Lerp(this.transform.rotation, targetRotation, Time.deltaTime * 5);
+            transform.rotation = Quaternion.Lerp(this.transform.rotation, targetRotation, Time.deltaTime * 5);
         }
-
     }
 
     void ReachedGoal()
     {
-        GameObject.FindObjectOfType<ScoreManager>().LoseLife();
-        Destroy(gameObject);
+        scoreManager.LoseLife();
+        gameObject.SetActive(false);
+        dead = true;
     }
 
     public void TakeDamage(float damage)
     {
         health -= damage;
-        Debug.Log(health);
         if (health <= 0)
         {
             Die();
@@ -88,8 +88,8 @@ public class Enemy : MonoBehaviour
 
     public void Die()
     {
-        // TODO: Do this more safely!
-        GameObject.FindObjectOfType<ScoreManager>().money += moneyValue;
-        Destroy(gameObject);
+        scoreManager.money += moneyValue;
+        gameObject.SetActive(false);
+        dead = true;
     }
 }

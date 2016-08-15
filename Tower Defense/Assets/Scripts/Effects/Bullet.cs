@@ -6,7 +6,7 @@ public class Bullet : MonoBehaviour
 
     public float speed = 15f;
     public Transform target;
-    public float damage = 1f;
+    public float damage;
     public float radius = 0;
     public bool start = false;
 
@@ -61,10 +61,10 @@ public class Bullet : MonoBehaviour
         else
         {
             Collider[] cols = Physics.OverlapSphere(transform.position, radius);
-
+       
             foreach (Collider c in cols)
             {
-                Enemy e = c.GetComponent<Enemy>();
+                Enemy e = c.GetComponentInParent<Enemy>();
                 if (e != null)
                 {
                     // TODO: You COULD do a falloff of damage based on distance, but that's rare for TD games

@@ -375,7 +375,8 @@ MonoBehaviour:
   range: 15
   bulletPrefab: {fileID: 100662, guid: a02b5f123e6bce14d9354fc67a0c8906, type: 2}
   cost: 5
-  damage: 1
+  fireCooldown: 1.5
+  damage: 3
   radius: 0
 --- !u!1001 &100100000
 Prefab:
@@ -403,6 +404,14 @@ Prefab:
     - target: {fileID: 0}
       propertyPath: m_Name
       value: Basic Tower
+      objectReference: {fileID: 0}
+    - target: {fileID: 0}
+      propertyPath: damage
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 0}
+      propertyPath: fireCooldown
+      value: 1.5
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 0}
