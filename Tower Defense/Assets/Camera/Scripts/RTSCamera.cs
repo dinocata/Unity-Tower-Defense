@@ -13,7 +13,7 @@ public class RTSCamera : MonoBehaviour {
 
     private const int ZoomSpeed = 25;
     private const int ZoomMin = 20;
-    private const int ZoomMax = 35;
+    private const int ZoomMax = 37;
 
     private const int PanSpeed = 50;
     private const int PanAngleMin = 50;

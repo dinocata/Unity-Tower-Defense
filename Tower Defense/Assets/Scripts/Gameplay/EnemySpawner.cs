@@ -4,79 +4,84 @@ using System.Collections.Generic;
 
 public class EnemySpawner : MonoBehaviour {
 
-    float spawnCD = 2f;
-    float spawnCDremaining = 5;
+    public float difficultyFactor = 1.25f;
 
-    private int spawnerIndex = 0;
-    private MainPath mainPath;
-    private ScoreManager scoreManager;
+    public float spawnCD = 5f;
+    private float spawnCDremaining = 5f;
+    private bool active = false;
 
-    [System.Serializable]
+    [System.NonSerialized]
+    public MainPath mainPath;
+    [System.NonSerialized]
+    public ScoreManager scoreManager;
+
+    [System.NonSerialized]
+    public int wcIndex = 0;
+
     public class WaveComponent{
         public GameObject enemyPrefab;
         public int num;
+        public float cd;
         [System.NonSerialized]
         public int spawned = 0;
-        [System.NonSerialized]
-        public List<Enemy> enemies = new List<Enemy>();
     }
 
-    public WaveComponent[] waveComps;
+    public List<WaveComponent> waveComps = new List<WaveComponent>();
+
+    public float getWaveCooldown()
+    {
+        float waveCooldown = 0f;
+        foreach (WaveComponent wc in waveComps)
+        {
+            waveCooldown += (wc.cd * wc.num) + spawnCD;
+        }
+        return waveCooldown;
+    }
 
 	// Use this for initialization
 	void Start () {
-        mainPath = GameObject.Find("Path").GetComponent<MainPath>();
-        scoreManager = GameObject.Find("_SCRIPTS_").GetComponent<ScoreManager>();
-
-        // Prespawn (to avoid fps hiccups on dynamic instantiates)
-        foreach (WaveComponent wc in waveComps)
-        {
-            for (int i = 0; i < wc.num; i++)
-            {
-                // Spawn it
-                GameObject enemyGO = (GameObject)Instantiate(wc.enemyPrefab, transform.position, transform.rotation);
-                enemyGO.SetActive(false);
-                Enemy enemy = enemyGO.GetComponent<Enemy>();
-                enemy.mainPath = mainPath;
-                enemy.scoreManager = scoreManager;
-                wc.enemies.Add(enemy);
-            }
-        }
+     
 	}
 	
 	// Update is called once per frame
 	void Update () {
-        bool didSpawn = false;
-        spawnCDremaining -= Time.deltaTime;
-        if (spawnCDremaining <= 0)
+        if (active)
         {
-            spawnCDremaining = spawnCD;
+            spawnCDremaining -= Time.deltaTime;
+            if (spawnCDremaining <= 0)
+            {
+                WaveComponent wc = waveComps[wcIndex];
+                GameObject enemyGO = (GameObject)Instantiate(wc.enemyPrefab, transform.position, transform.rotation);
+                Enemy enemy = enemyGO.GetComponent<Enemy>();
+                enemy.mainPath = mainPath;
+                enemy.scoreManager = scoreManager;
+                enemy.health *= Mathf.Pow(difficultyFactor, (scoreManager.level - 1));
+                enemy.moneyValue *= scoreManager.level;
+                wc.spawned++;
 
-            // Go through the wave comps until we find something to spawn
-            foreach (WaveComponent wc in waveComps)
-            {
-                if (wc.spawned < wc.num)
+                spawnCDremaining = wc.cd;
+
+                if (wc.spawned >= wc.num)
                 {
-                    // Spawn it
-                    GameObject enemyGO = wc.enemies[wc.spawned].gameObject;
-                    enemyGO.SetActive(true);
-                    enemyGO.transform.GetChild(0).gameObject.GetComponent<Renderer>().enabled = true;
-                    enemyGO.transform.GetChild(0).gameObject.SetActive(true);
-                    wc.spawned++;
-                    didSpawn = true;
-                    break;
+                    wcIndex++;
+                    spawnCDremaining += spawnCD;
+
+                    if (wcIndex >= waveComps.Count)
+                    {
+                        foreach (WaveComponent waveComp in waveComps)
+                            waveComp.spawned = 0;
+                        wcIndex = 0;
+                        active = false;    
+                    }
                 }
-            }
-            if (!didSpawn)
-            {
-                spawnCDremaining = 5f;
-                transform.parent.GetChild(spawnerIndex++).gameObject.SetActive(false);
-                if (spawnerIndex >= transform.parent.childCount)
-                {
-                    spawnerIndex = 0;
-                }
-                transform.parent.GetChild(spawnerIndex).gameObject.SetActive(true);
             }
         }
 	}
+
+    public void start(float delay) {
+        active = true;
+        spawnCDremaining = delay;
+    }
+
+    public bool getStatus() { return active; }
 }

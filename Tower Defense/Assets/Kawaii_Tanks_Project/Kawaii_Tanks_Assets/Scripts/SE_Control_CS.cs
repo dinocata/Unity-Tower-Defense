@@ -11,8 +11,6 @@ public class SE_Control_CS : MonoBehaviour {
 	[ Tooltip ( "Maximum Pitch" ) ] public float maxPitch = 2.0f ;
 	[ Tooltip ( "Minimum Volume" ) ] public float minVolume = 0.1f ;
 	[ Tooltip ( "Maximum Volume" ) ] public float maxVolume = 0.3f ;
-	[ Tooltip ( "Reference Right wheel." ) ] public Rigidbody rightReferenceWheel ;
-	[ Tooltip ( "Reference Left wheel." ) ]public Rigidbody leftReferenceWheel ;
 
 	AudioSource thisAudioSource ;
 	float leftCircumference ;
@@ -27,26 +25,7 @@ public class SE_Control_CS : MonoBehaviour {
 			Destroy ( this );
 		}
 		thisAudioSource.loop = true ;
-		thisAudioSource.volume = 0.0f ;
+		thisAudioSource.volume = 0.2f ;
 		thisAudioSource.Play () ;
-		// Calculate Circumference.
-		if ( leftReferenceWheel && rightReferenceWheel ) {
-			leftCircumference = DOUBLE_PI * leftReferenceWheel.GetComponent < SphereCollider > ().radius ;
-			rightCircumference = DOUBLE_PI * rightReferenceWheel.GetComponent < SphereCollider > ().radius ;
-		} else {
-			Debug.LogError ( "Reference Wheels are not assigned in "+ this.name ) ;
-			Destroy ( this );
-		}
-	}
-	
-	void Update () {
-		float leftVelocity ;
-		float rightVelocity ;
-		leftVelocity = leftReferenceWheel.angularVelocity.magnitude / DOUBLE_PI * leftCircumference ;
-		rightVelocity = rightReferenceWheel.angularVelocity.magnitude / DOUBLE_PI * rightCircumference ;
-		float targetRate = ( leftVelocity + rightVelocity ) / 2.0f / maxSpeed ;
-		currentRate = Mathf.MoveTowards ( currentRate , targetRate , 0.02f ) ;
-		thisAudioSource.pitch = Mathf.Lerp ( minPitch , maxPitch , currentRate ) ;
-		thisAudioSource.volume = Mathf.Lerp ( minVolume , maxVolume , currentRate ) ;
 	}
 }

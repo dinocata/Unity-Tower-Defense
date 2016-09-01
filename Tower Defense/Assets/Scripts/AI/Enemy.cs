@@ -3,27 +3,17 @@ using System.Collections;
 
 public class Enemy : MonoBehaviour
 {
+    public GameObject explosionPrefab;
+
     private Transform targetPathNode;
     private int pathNodeIndex = 0;
-    private bool dead = false;
-
+    
     public float speed = 5f;
     public float health = 10f;
     public int moneyValue = 1;
 
     public MainPath mainPath;
     public ScoreManager scoreManager;
-
-    public bool isDead()
-    {
-        return dead;
-    }
-
-    // Use this for initialization
-    void Start()
-    {
-
-    }
 
     void GetNextPathNode()
     {
@@ -73,15 +63,14 @@ public class Enemy : MonoBehaviour
     void ReachedGoal()
     {
         scoreManager.LoseLife();
-        gameObject.SetActive(false);
-        dead = true;
+        Destroy(gameObject);
     }
 
     public void TakeDamage(float damage)
     {
         health -= damage;
         if (health <= 0)
-        {
+        {      
             Die();
         }
     }
@@ -89,7 +78,8 @@ public class Enemy : MonoBehaviour
     public void Die()
     {
         scoreManager.money += moneyValue;
-        gameObject.SetActive(false);
-        dead = true;
+        GameObject explosionGO = (GameObject)Instantiate(explosionPrefab, transform.position, transform.rotation);
+        Destroy(explosionGO, 2f);
+        Destroy(gameObject);
     }
 }

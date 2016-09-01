@@ -5,12 +5,16 @@ using UnityEngine.UI;
 
 public class ScoreManager : MonoBehaviour
 {
+    public float levelCooldown = 25f;
 
     public int lives = 20;
-    public float money = 100f;
+    public int level = 1;
+    public int money = 100;
 
     public Text moneyText;
     public Text livesText;
+    public Text cooldownText;
+    public Text levelText;
 
     public void LoseLife(int l = 1)
     {
@@ -28,13 +32,17 @@ public class ScoreManager : MonoBehaviour
         SceneManager.LoadScene(SceneManager.GetActiveScene().name);
     }
 
-    void Update()
+    private void updateScore()
     {
-        // FIXME: This doesn't actually need to update the text every frame.
-        moneyText.text = "Money: $" + money.ToString();
+        moneyText.text = "$" + money.ToString();
         livesText.text = "Lives: " + lives.ToString();
-
-
     }
 
+    void Start()
+    {
+        moneyText.text = "Money: $" + money.ToString();
+        livesText.text = "Lives: " + lives.ToString();
+        levelText.text = "LEVEL " + level.ToString();
+        InvokeRepeating("updateScore", 0f, 0.2f);
+    }
 }
